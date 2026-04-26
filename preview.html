@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>S.T.A.L.K.E.R. 2 — Данило</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@300;400;700&display=swap');
+
+    :root {
+      --bg: #0d0b09;
+      --panel: #15110e;
+      --panel-dark: #0a0907;
+      --green: #152218;
+      --green-light: #2d402c;
+      --gray: #7f8079;
+      --text: #f2eee5;
+      --muted: #a69d90;
+      --orange: #ff7a00;
+      --orange-soft: rgba(255, 122, 0, 0.35);
+      --border: rgba(255, 122, 0, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(45, 64, 44, 0.55), transparent 38%),
+        linear-gradient(180deg, #111610 0%, var(--bg) 52%, #090806 100%);
+      color: var(--text);
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 18px 10px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.09;
+      background-image:
+        linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 4px 4px;
+      mix-blend-mode: overlay;
+      z-index: 5;
+    }
+
+    .pda {
+      width: min(100%, 430px);
+      background: rgba(18, 14, 11, 0.96);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 0 40px rgba(0,0,0,0.75), 0 0 24px rgba(255,122,0,0.08);
+      overflow: hidden;
+      animation: fadeIn 0.8s ease both;
+      position: relative;
+    }
+
+    .topbar {
+      height: 58px;
+      background: #f4f4f4;
+      color: #202126;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 700 22px/1 "Roboto Condensed", sans-serif;
+      letter-spacing: 0.5px;
+      position: relative;
+    }
+
+    .topbar .back, .topbar .close {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 34px;
+      font-weight: 300;
+    }
+
+    .topbar .back { left: 16px; }
+    .topbar .close { right: 18px; }
+
+    .hero {
+      min-height: 490px;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.55)),
+        radial-gradient(circle at 52% 45%, rgba(42, 55, 39, 0.28), transparent 42%),
+        linear-gradient(135deg, #10150f, #1a2119 42%, #080907 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 4px);
+      opacity: .38;
+      pointer-events: none;
+    }
+
+    .logo {
+      position: absolute;
+      top: 18px;
+      left: 22px;
+      z-index: 2;
+      font-family: "Oswald", sans-serif;
+      font-size: 27px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-shadow: 0 0 8px rgba(255,255,255,0.35);
+    }
+
+    .logo small {
+      display: block;
+      margin-top: 3px;
+      font-size: 7px;
+      letter-spacing: 3.5px;
+      color: rgba(255,255,255,0.62);
+    }
+
+    .character {
+      position: absolute;
+      left: 50%;
+      top: 90px;
+      bottom: auto;
+      transform: translateX(-50%);
+      width: 230px;
+      height: auto;
+      object-fit: unset;
+      object-position: 50% 15%;
+      border-radius: 0;
+      filter: brightness(0.96) contrast(1.04) saturate(0.92);
+      opacity: 1;
+      box-shadow: none;
+      border: none;
+      outline: none;
+      background: transparent;
+      transition: transform 0.3s ease;
+    }
+
+    .character:hover {
+      transform: translateX(-50%) scale(1.1);
+    }
+
+    .hero-name {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 3;
+      padding: 14px 24px 18px;
+      background: rgba(10, 9, 7, 0.72);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-family: "Oswald", sans-serif;
+      color: var(--orange);
+      font-size: 44px;
+      font-weight: 500;
+      line-height: 1;
+      text-shadow: 0 0 14px rgba(255,122,0,0.25);
+      cursor: default;
+    }
+
+    .hero-name {
+      transition: 0.2s;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.85; }
+      100% { opacity: 1; }
+    }
+
+    .hero-name:hover {
+      animation: flicker 0.2s infinite;
+    }
+
+    .tabs {
+      padding: 14px 32px 6px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .tab {
+      min-height: 52px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      font-family: "Oswald", sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      text-align: left;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: .22s ease;
+      position: relative;
+    }
+
+    .tab::before {
+      content: "▰";
+      width: 28px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      color: #111;
+      background: #f1eee6;
+      border-radius: 4px;
+      font-size: 15px;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.18);
+      transform: rotate(-4deg);
+    }
+
+    .tab.active {
+      border-left: 5px solid var(--orange);
+      border-right: 5px solid var(--orange);
+      background: linear-gradient(90deg, rgba(255,122,0,0.16), rgba(255,122,0,0.04), rgba(255,122,0,0.16));
+      box-shadow: 0 0 18px rgba(255,122,0,0.12) inset;
+    }
+
+    .tab:hover {
+      color: #fff;
+      text-shadow: 0 0 10px var(--orange-soft);
+    }
+
+    .content {
+      padding: 12px 32px 18px;
+      min-height: 300px;
+    }
+
+    .audio-line {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 8px 0 28px;
+    }
+
+    .play-btn {
+      width: 56px;
+      height: 56px;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      background: transparent;
+      color: #fff;
+      font-size: 25px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .play-btn:hover, .gift:hover {
+      box-shadow: 0 0 20px var(--orange-soft), 0 0 8px var(--orange-soft) inset;
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .wave {
+      flex: 1;
+      height: 44px;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,.18) 0 2px,
+        transparent 2px 6px
+      );
+      mask-image: linear-gradient(180deg, transparent 5%, #000 25%, #000 75%, transparent 95%);
+      opacity: .75;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .waveProgress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--orange);
+      opacity: 0.75;
+    }
+
+    .panel {
+      animation: fadeIn .35s ease both;
+    }
+
+    .panel p {
+      font-size: 22px;
+      line-height: 1.38;
+      margin-bottom: 16px;
+      color: #eee7dc;
+    }
+
+    .panel b {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .legendary {
+      color: var(--orange);
+      font-weight: 700;
+      text-shadow: 0 0 12px rgba(255,122,0,0.45);
+    }
+
+    .legend-marks {
+      display: inline-flex;
+      gap: 5px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .legend-marks span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 8px var(--orange);
+    }
+
+    .gift-wrap {
+      padding: 8px 32px 34px;
+    }
+
+    .gift {
+      width: 100%;
+      min-height: 74px;
+      background:
+        linear-gradient(180deg, #1a1a17, #080807),
+        linear-gradient(90deg, transparent, rgba(255,122,0,.22), transparent);
+      color: var(--text);
+      border: 2px solid rgba(255,122,0,.52);
+      outline: 2px solid rgba(0,0,0,.75);
+      font-family: "Oswald", sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      box-shadow: 0 0 18px rgba(255,122,0,0.25), inset 0 0 22px rgba(0,0,0,.9);
+      transition: .22s ease;
+    }
+
+    .gift .rad {
+      color: var(--orange);
+      font-size: 30px;
+    }
+
+    .hidden-message {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-left: 4px solid var(--orange);
+      background: rgba(255,122,0,0.08);
+      font-size: 20px;
+      line-height: 1.35;
+      animation: fadeIn .35s ease both;
+    }
+
+    .hidden-message.show {
+      display: block;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.72);
+      z-index: 10;
+      padding: 18px;
+    }
+
+    .modal.show { display: flex; }
+
+    .modal-card {
+      width: min(100%, 390px);
+      background: linear-gradient(180deg, #191511, #090806);
+      border: 1px solid var(--border);
+      box-shadow: 0 0 34px rgba(255,122,0,.22);
+      padding: 22px;
+      text-align: center;
+      animation: fadeIn .25s ease both;
+    }
+
+    .modal-card h2 {
+      font-family: "Oswald", sans-serif;
+      color: var(--orange);
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .modal-card p {
+      font-size: 22px;
+      line-height: 1.35;
+      margin-bottom: 18px;
+    }
+
+    .close-modal {
+      padding: 10px 22px;
+      background: transparent;
+      border: 1px solid var(--orange);
+      color: var(--orange);
+      font-family: "Oswald", sans-serif;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 12px;
+      filter: sepia(1) hue-rotate(355deg) saturate(1.5);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); text-shadow: 2px 0 #00ff9c, -2px 0 var(--orange); }
+      25% { transform: translate(-1px, 1px); text-shadow: -2px 0 #00ff9c, 2px 0 var(--orange); }
+      50% { transform: translate(1px, -1px); text-shadow: 2px 0 #fff, -2px 0 var(--orange); }
+      100% { transform: translate(0); text-shadow: 0 0 14px rgba(255,122,0,0.25); }
+    }
+
+    @media (max-width: 380px) {
+      body { padding: 0; }
+      .pda { width: 100%; min-height: 100vh; }
+      .tabs, .content, .gift-wrap { padding-left: 22px; padding-right: 22px; }
+      .tab { font-size: 21px; }
+      .panel p { font-size: 20px; }
+      .hero-name { font-size: 40px; }
+      .gift { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="pda">
+    <section class="hero">
+      <div class="logo">S.T.A.L.K.E.R. 2<small>HEART OF CHORNOBYL</small></div>
+      <!-- Заглушка фото: заміни src на свій файл, наприклад img/danylo.png -->
+      <img class="character" src="img/danylo.png" alt="Фото персонажа Данило" />
+      <h1 class="hero-name" data-text="Данило">Данило</h1>
+    </section>
+
+    <nav class="tabs" aria-label="PDA tabs">
+      <button class="tab active" data-tab="archive">Архів НДІЧАЗ</button>
+      <button class="tab" data-tab="pda">Матеріали КПК</button>
+    </nav>
+
+    <section class="content">
+      <div class="panel" id="archive">
+        <div class="audio-line">
+          <button class="play-btn" id="quickPlay" aria-label="Play">▶</button>
+
+          <div class="wave" id="waveSeek">
+            <div class="waveProgress" id="waveProgress"></div>
+          </div>
+        </div>
+
+        <audio id="audioPlayer" src="Audio/description.mp3" preload="auto"></audio>
+
+        <p><b>Далін:</b> Архів НДІЧАЗ, витяг із особової справи СЧ 20-00</p>
+        <p>
+          <b>Позивний:</b> «Данило»<br />
+          <b>Справжнє ім’я:</b> Засекречено<br />
+          <b>Вік:</b> 21<br />
+          <span class="muted"><b>Фракція:</b> Вільний сталкер</span><br />
+          <b>Рівень:</b> <span class="legendary">Легендарний</span>
+          <span class="legend-marks"><span></span><span></span><span></span><span></span></span>
+        </p>
+        <p><b>Опис:</b> Активний сталкер із підтвердженою стійкістю до навантажень. Завзятий, доводить задачі до завершення незалежно від умов. Висока концентрація, здатність швидко оцінювати обстановку та приймати рішення без затримок. Лояльний до близьких, не залишає своїх у критичних ситуаціях. Рівень відповідальності за напарників — високий. У мотивації домінує стабільна прив’язаність до однієї цілі (дівчини), що підсилює витривалість і рішучість. Поза Зоною — програміст. Працює із складними системами, ефективно аналізує інформацію, адаптується до змін середовища. Фізична підготовка включає досвід капоейри: розвинена реакція, координація та контроль дистанції. Надійність підтверджена. Придатний до виконання завдань підвищеної складності та роботи в умовах ризику.</p>
+      </div>
+
+      <div class="panel" id="pda" hidden>
+        <div class="audio-line">
+          <button class="play-btn" id="pdaPlay" aria-label="Play">▶</button>
+
+          <div class="wave" id="pdaWaveSeek">
+            <div class="waveProgress" id="pdaWaveProgress"></div>
+          </div>
+        </div>
+
+        <audio id="pdaAudioPlayer" src="Audio/pda.mp3" preload="auto"></audio>
+
+        <p><b>Далін:</b> КПК № 15. Вилучено з особистого сховища сталкера.</p>
+
+        <p>
+          <b>Запис:</b> Після викиду зв’язок пропав на три години.
+          Данило вийшов на частоту вже за темряви.
+          Сказав коротко: «Артефакт у мене. Повернення — через резервний шлях.»
+        </p>
+
+        <p>
+          Згідно з архівними даними, об’єкт залишив Зону задовго до актуальних подій.
+          Евакуація відбулась у перші роки повномасштабного конфлікту 2022 року.
+          Напрямок — захід. Кінцева точка — Кіпр.
+        </p>
+
+        <p>
+          У записах КПК виявлено згадки про подальший маршрут:
+          наступний етап — навчання у французькому університеті.
+          Причина — розширення можливостей, доступ до нових технологій,
+          підвищення кваліфікації. 
+        </p>
+
+        <p>
+          Ключова позначка в журналі: «Повернення»
+          Контекст не уточнюється, але з огляду на часові мітки — мова про зону.
+        </p>
+
+        <p>
+          Додатково: у кількох записах згадується Зона як точка відліку,
+          а не кінцева станція. Формулювання повторюється:
+          «Тимчасово поза маршрутом»
+        </p>
+
+        <p>
+          Останній лог перед обривом:
+          «Шлях довгий. Але координати залишились ті самі».
+        </p>
+
+        <p>
+          У журналі також згадується маршрут через старий тунель, де датчики
+          показували аномальну активність. Позначка на мапі підписана лише одним словом:
+          <span class="legendary">«Не заходити»</span>.
+        </p>
+        </div>
+
+    </section>
+
+    <section class="gift-wrap">
+      <button class="gift" id="giftButton"><span class="rad">☢</span> Отримати подарунок</button>
+      <div class="hidden-message" id="hiddenMessage">
+        <p>Подарунок розблоковано: запис у мережі сталкерів — статус «свій».</p>
+        <p><i>Деякі двері відкриваються без питань.</i></p>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h2>Подарунок отримано</h2>
+      <p>Координати тайника додано в КПК. Не забудь взяти болти й аптечку.</p>
+      <button class="close-modal" id="closeModal">Закрити</button>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    const giftButton = document.getElementById('giftButton');
+    const hiddenMessage = document.getElementById('hiddenMessage');
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+    const quickPlay = document.getElementById('quickPlay');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+
+        tabs.forEach(item => item.classList.remove('active'));
+        tab.classList.add('active');
+
+        panels.forEach(panel => {
+          panel.hidden = panel.id !== target;
+        });
+
+        audioPlayer.pause();
+        pdaAudioPlayer.pause();
+        quickPlay.textContent = '▶';
+        pdaPlay.textContent = '▶';
+      });
+    });
+
+    giftButton.addEventListener('click', () => {
+      hiddenMessage.classList.add('show');
+      modal.classList.add('show');
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.classList.remove('show');
+    });
+
+    modal.addEventListener('click', event => {
+      if (event.target === modal) modal.classList.remove('show');
+    });
+
+    quickPlay.addEventListener('click', () => {
+      if (audioPlayer.paused) {
+        pdaAudioPlayer.pause();
+        pdaPlay.textContent = '▶';
+
+        audioPlayer.play().catch(() => {
+          alert('Не вдалося відтворити аудіо. Перевір шлях: Audio/description.mp3');
+        });
+        quickPlay.textContent = 'Ⅱ';
+      } else {
+        audioPlayer.pause();
+        quickPlay.textContent = '▶';
+      }
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      quickPlay.textContent = '▶';
+      waveProgress.style.width = '0%';
+    });
+    
+    const waveSeek = document.getElementById('waveSeek');
+    const waveProgress = document.getElementById('waveProgress');
+
+    waveSeek.addEventListener('click', (e) => {
+      if (!audioPlayer.duration) return;
+
+      const rect = waveSeek.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percent = x / rect.width;
+
+      audioPlayer.currentTime = percent * audioPlayer.duration;
+    });
+
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!audioPlayer.duration) return;
+
+      const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      waveProgress.style.width = percent + '%';
+    });
+
+
+    const pdaPlay = document.getElementById('pdaPlay');
+    const pdaAudioPlayer = document.getElementById('pdaAudioPlayer');
+    const pdaWaveSeek = document.getElementById('pdaWaveSeek');
+    const pdaWaveProgress = document.getElementById('pdaWaveProgress');
+
+    pdaPlay.addEventListener('click', () => {
+      if (pdaAudioPlayer.paused) {
+        audioPlayer.pause();
+        quickPlay.textContent = '▶';
+
+        pdaAudioPlayer.play().catch(() => {
+          alert('Не вдалося відтворити аудіо. Перевір шлях: Audio/pda.mp3');
+        });
+
+        pdaPlay.textContent = 'Ⅱ';
+      } else {
+        pdaAudioPlayer.pause();
+        pdaPlay.textContent = '▶';
+      }
+    });
+
+    pdaAudioPlayer.addEventListener('ended', () => {
+      pdaPlay.textContent = '▶';
+      pdaWaveProgress.style.width = '0%';
+    });
+
+    pdaWaveSeek.addEventListener('click', (e) => {
+      if (!pdaAudioPlayer.duration) return;
+
+      const rect = pdaWaveSeek.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percent = x / rect.width;
+
+      pdaAudioPlayer.currentTime = percent * pdaAudioPlayer.duration;
+    });
+
+    pdaAudioPlayer.addEventListener('timeupdate', () => {
+      if (!pdaAudioPlayer.duration) return;
+
+      const percent = (pdaAudioPlayer.currentTime / pdaAudioPlayer.duration) * 100;
+      pdaWaveProgress.style.width = percent + '%';
+    });
+
+  </script>
+</body>
+</html>
